@@ -1,6 +1,7 @@
 import ast
 from pathlib import Path
 
+
 # Parses Python files into AST trees
 class PythonParser:
     # Parse a Python file and return its AST tree
