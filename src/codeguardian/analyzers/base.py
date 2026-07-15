@@ -2,9 +2,9 @@ import ast
 from abc import ABC, abstractmethod
 
 
-# Base class for all CodeGuardian analyzers
+# Base class for all analyzers
 class BaseAnalyzer(ABC):
-    # Analyze an AST tree and return findings.
+    # Analyze an AST tree
     @abstractmethod
     def analyze(self, tree: ast.AST):
-        pass
+        raise NotImplementedError
