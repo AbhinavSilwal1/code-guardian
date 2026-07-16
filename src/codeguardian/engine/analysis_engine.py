@@ -9,6 +9,7 @@ from codeguardian.analyzers.long_function import (
 from codeguardian.analyzers.too_many_arguments import (
     TooManyArgumentsAnalyzer,
 )
+from codeguardian.analyzers.dead_code import DeadCodeAnalyzer
 from codeguardian.scanner import find_python_files
 
 
@@ -21,6 +22,7 @@ class AnalysisEngine:
             UnusedImportAnalyzer(),
             LongFunctionAnalyzer(),
             TooManyArgumentsAnalyzer(),
+            DeadCodeAnalyzer(),
         ]
 
     def analyze_repository(self, directory: Path):
