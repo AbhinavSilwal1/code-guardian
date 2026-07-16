@@ -3,10 +3,24 @@ from rich.console import Console
 from codeguardian.scanner import find_python_files
 from pathlib import Path
 from codeguardian.engine import AnalysisEngine
+from rich.panel import Panel
 
 
 app = typer.Typer()
 console = Console()
+
+
+def severity_color(severity):
+    colors = {
+        "HIGH": "red",
+        "MEDIUM": "yellow",
+        "LOW": "green",
+    }
+
+    return colors.get(
+        severity.value,
+        "white"
+    )
 
 
 # Callback function
@@ -41,8 +55,17 @@ def scan(path: str):
         console.print("[green]✓ No issues found.[/green]")
     else:
         console.print(f"[yellow]Found {len(issues)} issue(s):[/yellow]\n")
+    
     for issue in issues:
-        console.print(issue)
+        color = severity_color(issue.severity)
+
+        console.print(
+            Panel(
+                str(issue),
+                title=f"[{color}]{issue.category}[/{color}]",
+                expand=False
+            )
+        )
 
 
 if __name__ == "__main__":

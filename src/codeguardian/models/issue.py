@@ -24,14 +24,17 @@ class Issue:
 
     # Human-readable representation
     def __str__(self):
-        location = f"{self.file}"
-
-        if self.line:
-            location += f":{self.line}"
-
         return (
-            f"[{self.severity}] "
-            f"{self.category}: "
-            f"{self.message} "
-            f"({location})"
+            f"\n"
+            f"⚠ {self.category}\n"
+            f"\n"
+            f"Severity: {self.severity.value}\n"
+            f"File: {self.file}\n"
+            f"Line: {self.line}\n"
+            f"\n"
+            f"Message:\n"
+            f"{self.message}\n"
+            f"\n"
+            f"Suggestion:\n"
+            f"{self.suggestion}\n"
         )
