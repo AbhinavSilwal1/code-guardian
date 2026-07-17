@@ -1,0 +1,17 @@
+rules:
+  unused_import:
+    enabled: true
+
+  dead_code:
+    enabled: true
+
+  long_function:
+    enabled: true
+    max_lines: 75
+
+  too_many_arguments:
+    enabled: true
+    max_arguments: 6
+
+  circular_dependency:
+    enabled: true
