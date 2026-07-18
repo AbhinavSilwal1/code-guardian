@@ -6,6 +6,7 @@ from codeguardian.engine import AnalysisEngine
 from rich.panel import Panel
 from codeguardian.config import load_config
 from codeguardian.formatters import issues_to_json
+from codeguardian.report import SummaryReport
 
 
 app = typer.Typer()
@@ -48,10 +49,12 @@ def scan(
 ):
     config_data = load_config(config)
     engine = AnalysisEngine()
+    issues = engine.analyze_repository(Path(path))
+    python_files = find_python_files(path)
 
-    issues = engine.analyze_repository(
-        Path(path)
-    )
+    if json_output:
+        print(issues_to_json(issues))
+        return
 
     console.print("\n[bold blue]Scanning project...[/bold blue]\n")
     if not issues:
@@ -69,14 +72,14 @@ def scan(
                 expand=False
             )
         )
+    
+    report = SummaryReport(
+        len(python_files),
+        issues,
+    )
 
-    if json_output:
-        print(
-            issues_to_json(
-                issues
-            )
-        )
-        return
+    console.print()
+    console.print(report.generate())
 
 
 if __name__ == "__main__":
