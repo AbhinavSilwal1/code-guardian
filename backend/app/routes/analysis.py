@@ -1,7 +1,6 @@
 from fastapi import APIRouter
-
-from app.schemas.analysis import AnalysisResponse
-from app.services.guardian_service import analyze_project
+from backend.app.schemas.analysis import AnalysisResponse
+from backend.app.services.guardian_service import analyze_project
 
 
 router = APIRouter(

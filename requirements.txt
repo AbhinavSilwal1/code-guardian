@@ -1,10 +1,14 @@
 annotated-doc==0.0.4
 annotated-types==0.7.0
 anyio==4.14.2
+certifi==2026.6.17
 click==8.4.2
+-e git+https://github.com/AbhinavSilwal1/code-guardian.git@b9d3f30632a84b6bcc04c0a2e5bc34e64d97663f#egg=codeguardian
 colorama==0.4.6
 fastapi==0.139.2
 h11==0.16.0
+httpcore==1.0.9
+httpx==0.28.1
 idna==3.18
 iniconfig==2.3.0
 mando==0.7.1
