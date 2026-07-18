@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "codeguardian"
+version = "1.0.0"
+description = "Static code analysis tool for Python projects"
+requires-python = ">=3.10"
+dependencies = [
+    "typer",
+    "rich",
+    "pyyaml",
+]
+
+
+[tool.setuptools.packages.find]
+where = ["src"]
