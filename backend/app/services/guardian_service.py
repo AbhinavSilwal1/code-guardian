@@ -5,8 +5,19 @@ from codeguardian.scanner import find_python_files
 from codeguardian.formatters import issue_to_dict
 
 
+BASE_DIR = Path(__file__).resolve().parents[3]
+
+
 def analyze_project(path: str):
     project_path = Path(path)
+
+    if not project_path.is_absolute():
+        project_path = BASE_DIR / project_path
+
+    if not project_path.exists():
+        raise FileNotFoundError(
+            f"Project path not found: {project_path}"
+        )
 
     engine = AnalysisEngine()
 
