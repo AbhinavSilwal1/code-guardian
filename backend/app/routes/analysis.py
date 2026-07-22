@@ -1,17 +1,18 @@
-from fastapi import APIRouter
-from app.schemas.analysis import AnalysisResponse
-from app.services.guardian_service import analyze_project
+from fastapi import APIRouter, HTTPException
+from backend.app.services.guardian_service import analyze_project
 
 
-router = APIRouter(
-    prefix="/api",
-    tags=["Analysis"],
-)
+router = APIRouter()
 
 
-@router.post(
-    "/analyze",
-    response_model=AnalysisResponse,
-)
+@router.post("/analyze")
 def analyze(path: str):
-    return analyze_project(path)
+
+    try:
+        return analyze_project(path)
+
+    except FileNotFoundError as exc:
+        raise HTTPException(
+            status_code=404,
+            detail=str(exc),
+        ) from exc

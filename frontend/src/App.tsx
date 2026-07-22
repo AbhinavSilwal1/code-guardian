@@ -9,24 +9,44 @@ import type { AnalysisResponse } from "./types/guardian";
 function App() {
 
     const [path, setPath] = useState("");
-    const [data, setData] = useState<AnalysisResponse | null>(null);
-    const [loading, setLoading] = useState(false);
+
+    const [data, setData] =
+        useState<AnalysisResponse | null>(null);
+
+    const [loading, setLoading] =
+        useState(false);
+
+    const [error, setError] =
+        useState<string | null>(null);
 
 
     async function handleAnalyze() {
 
         setLoading(true);
 
+        setError(null);
+
+        setData(null);
+
         try {
-            const result = await analyzeProject(path);
+
+            const result =
+                await analyzeProject(path);
 
             setData(result);
 
-        } catch (error) {
-            console.error(error);
+        } catch (err) {
+
+            setError(
+                err instanceof Error
+                    ? err.message
+                    : "An unexpected error occurred."
+            );
 
         } finally {
+
             setLoading(false);
+
         }
     }
 
@@ -38,6 +58,8 @@ function App() {
 
                 <Header />
 
+
+                {/* Project Analysis Controls */}
 
                 <div className="mb-8 flex gap-4">
 
@@ -53,62 +75,136 @@ function App() {
 
 
                     <button
-                        className="rounded-lg bg-blue-600 px-6 text-white"
                         onClick={handleAnalyze}
+                        disabled={loading}
+                        className="rounded-lg bg-blue-600 px-6 py-3 font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                        {
-                            loading
-                                ? "Analyzing..."
-                                : "Analyze"
+                        {loading
+                            ? "Analyzing..."
+                            : "Analyze"
                         }
                     </button>
 
                 </div>
 
 
-                <section className="grid gap-6 md:grid-cols-2 lg:grid-cols-5">
+                {/* Error State */}
 
-                    <StatCard
-                        title="Files Scanned"
-                        value={
-                            data?.summary.files_scanned ?? 0
-                        }
-                    />
+                {error && (
 
-                    <StatCard
-                        title="Issues"
-                        value={
-                            data?.summary.total_issues ?? 0
-                        }
-                    />
+                    <div className="mb-8 rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
 
-                    <StatCard
-                        title="High"
-                        value={
-                            data?.summary.severity_counts?.HIGH ?? 0
-                        }
-                    />
+                        <p className="font-semibold">
+                            Analysis Failed
+                        </p>
 
-                    <StatCard
-                        title="Medium"
-                        value={
-                            data?.summary.severity_counts?.MEDIUM ?? 0
-                        }
-                    />
+                        <p className="mt-1 text-sm">
+                            {error}
+                        </p>
 
-                    <StatCard
-                        title="Low"
-                        value={
-                            data?.summary.severity_counts?.LOW ?? 0
-                        }
-                    />
+                    </div>
 
-                </section>
+                )}
 
 
-                <IssuesTable
-                    issues={data?.issues ?? []}
-                />
+                {/* Loading State */}
+
+                {loading && (
+
+                    <div className="mb-8 rounded-lg bg-white p-6 text-center shadow">
+
+                        <p className="font-medium">
+                            Analyzing project...
+                        </p>
+
+                        <p className="mt-1 text-sm text-slate-500">
+                            Please wait while CodeGuardian scans your project.
+                        </p>
+
+                    </div>
+
+                )}
+
+
+                {/* Analysis Results */}
+
+                {data ? (
+
+                    <>
+
+                        {/* Summary Cards */}
+
+                        <section className="grid gap-6 md:grid-cols-2 lg:grid-cols-5">
+
+                            <StatCard
+                                title="Files Scanned"
+                                value={
+                                    data.summary.files_scanned
+                                }
+                            />
+
+                            <StatCard
+                                title="Issues"
+                                value={
+                                    data.summary.total_issues
+                                }
+                            />
+
+                            <StatCard
+                                title="High"
+                                value={
+                                    data.summary.severity_counts?.HIGH ?? 0
+                                }
+                            />
+
+                            <StatCard
+                                title="Medium"
+                                value={
+                                    data.summary.severity_counts?.MEDIUM ?? 0
+                                }
+                            />
+
+                            <StatCard
+                                title="Low"
+                                value={
+                                    data.summary.severity_counts?.LOW ?? 0
+                                }
+                            />
+
+                        </section>
+
+
+                        {/* Issues Table */}
+
+                        <IssuesTable
+                            issues={data.issues}
+                        />
+
+                    </>
+
+                ) : (
+
+                    /* Empty State */
+
+                    !loading &&
+                    !error && (
+
+                        <div className="rounded-xl bg-white p-8 text-center shadow">
+
+                            <h2 className="text-xl font-semibold">
+                                No analysis results yet
+                            </h2>
+
+                            <p className="mt-2 text-slate-500">
+                                Enter a project path above
+                                to begin scanning.
+                            </p>
+
+                        </div>
+
+                    )
+
+                )}
 
             </div>
 
