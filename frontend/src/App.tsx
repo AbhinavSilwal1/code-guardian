@@ -1,5 +1,7 @@
 import { useState } from "react";
 import Header from "./components/Header";
+import AnalysisSummary from "./components/AnalysisSummary";
+import IssueBreakdown from "./components/IssueBreakdown";
 import IssuesTable from "./components/IssuesTable";
 import StatCard from "./components/StatCard";
 import { analyzeProject } from "./api/guardianApi";
@@ -19,14 +21,18 @@ function App() {
     const [error, setError] =
         useState<string | null>(null);
 
+    const [analysisDuration, setAnalysisDuration] =
+        useState<number | null>(null);
+
+    const [lastAnalyzed, setLastAnalyzed] =
+        useState<Date | null>(null);
+
 
     async function handleAnalyze() {
 
         if (!path.trim()) {
 
-            setError(
-                "Please enter a project path before analyzing."
-            );
+            setError("Please enter a project path before analyzing.");
 
             return;
         }
@@ -38,11 +44,20 @@ function App() {
 
         setData(null);
 
+        const startTime =
+            performance.now();
 
         try {
 
             const result =
-                await analyzeProject(path.trim());
+                await analyzeProject(path);
+
+            const endTime =
+                performance.now();
+
+            setAnalysisDuration((endTime - startTime) / 1000);
+
+            setLastAnalyzed(new Date());
 
             setData(result);
 
@@ -59,7 +74,6 @@ function App() {
             setLoading(false);
 
         }
-
     }
 
 
@@ -203,9 +217,18 @@ function App() {
                         </div>
 
 
+                        {/* Analysis Metadata */}
+
+                        <AnalysisSummary
+                            path={path}
+                            duration={analysisDuration}
+                            lastAnalyzed={lastAnalyzed}
+                        />
+
+
                         {/* Summary Cards */}
 
-                        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+                        <section className="mb-8 grid gap-6 md:grid-cols-2 lg:grid-cols-5">
 
                             <StatCard
                                 title="Files Scanned"
@@ -246,6 +269,15 @@ function App() {
                             />
 
                         </section>
+
+
+                        {/* Issue Breakdown */}
+
+                        <IssueBreakdown
+                            categoryCounts={
+                                data.summary.category_counts
+                            }
+                        />
 
 
                         {/* Issues Table */}
