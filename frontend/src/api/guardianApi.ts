@@ -11,11 +11,6 @@ export async function analyzeProject(
     const url =
         `${API_URL}/api/analyze?path=${encodeURIComponent(path)}`;
 
-    console.log(
-        "Request URL:",
-        url
-    );
-
 
     const response = await fetch(
         url,
@@ -25,26 +20,33 @@ export async function analyzeProject(
     );
 
 
-    console.log(
-        "Response status:",
-        response.status
-    );
-
-
     if (!response.ok) {
 
-        const errorText =
-            await response.text();
+        let message =
+            "An unexpected error occurred while analyzing the project.";
 
-        console.error(
-            "API Error:",
-            response.status,
-            errorText
-        );
 
-        throw new Error(
-            `HTTP ${response.status}: ${errorText}`
-        );
+        try {
+
+            const errorData =
+                await response.json();
+
+
+            if (
+                typeof errorData.detail === "string"
+            ) {
+                message =
+                    errorData.detail;
+            }
+
+        } catch {
+
+            message =
+                "Unable to analyze the project.";
+        }
+
+
+        throw new Error(message);
     }
 
 

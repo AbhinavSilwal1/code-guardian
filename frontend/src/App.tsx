@@ -22,16 +22,27 @@ function App() {
 
     async function handleAnalyze() {
 
+        if (!path.trim()) {
+
+            setError(
+                "Please enter a project path before analyzing."
+            );
+
+            return;
+        }
+
+
         setLoading(true);
 
         setError(null);
 
         setData(null);
 
+
         try {
 
             const result =
-                await analyzeProject(path);
+                await analyzeProject(path.trim());
 
             setData(result);
 
@@ -48,59 +59,104 @@ function App() {
             setLoading(false);
 
         }
+
     }
 
 
     return (
-        <main className="min-h-screen bg-slate-100">
 
-            <div className="mx-auto max-w-7xl p-8">
+        <main className="min-h-screen bg-gradient-to-br from-slate-100 via-slate-50 to-slate-200">
+
+            <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
 
                 <Header />
 
 
                 {/* Project Analysis Controls */}
 
-                <div className="mb-8 flex gap-4">
+                <section className="mb-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
 
-                    <input
-                        className="flex-1 rounded-lg border p-3"
-                        placeholder="Project path..."
-                        value={path}
-                        onChange={
-                            (event) =>
-                                setPath(event.target.value)
-                        }
-                    />
+                    <div className="mb-4">
+
+                        <h2 className="text-lg font-semibold text-slate-900">
+                            Analyze a Project
+                        </h2>
+
+                        <p className="mt-1 text-sm text-slate-500">
+                            Enter a relative or absolute path to a Python project.
+                        </p>
+
+                    </div>
 
 
-                    <button
-                        onClick={handleAnalyze}
-                        disabled={loading}
-                        className="rounded-lg bg-blue-600 px-6 py-3 font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                        {loading
-                            ? "Analyzing..."
-                            : "Analyze"
-                        }
-                    </button>
+                    <div className="flex flex-col gap-3 sm:flex-row">
 
-                </div>
+                        <input
+                            className="flex-1 rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-500 focus:bg-white focus:ring-2 focus:ring-slate-200"
+                            placeholder="/Users/.../my-project"
+                            value={path}
+                            onChange={
+                                (event) =>
+                                    setPath(event.target.value)
+                            }
+                            onKeyDown={
+                                (event) => {
+
+                                    if (
+                                        event.key === "Enter"
+                                        && !loading
+                                    ) {
+                                        handleAnalyze();
+                                    }
+
+                                }
+                            }
+                        />
+
+
+                        <button
+                            onClick={handleAnalyze}
+                            disabled={loading}
+                            className="rounded-xl bg-slate-900 px-8 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-700 hover:shadow-md active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+
+                            {loading
+                                ? "Analyzing..."
+                                : "Analyze Project"
+                            }
+
+                        </button>
+
+                    </div>
+
+                </section>
 
 
                 {/* Error State */}
 
                 {error && (
 
-                    <div className="mb-8 rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
+                    <div className="mb-8 rounded-2xl border border-red-200 bg-red-50 p-5 shadow-sm">
 
-                        <p className="font-semibold">
-                            Analysis Failed
-                        </p>
+                        <div className="flex gap-4">
 
-                        <p className="mt-1 text-sm">
-                            {error}
-                        </p>
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600">
+                                !
+                            </div>
+
+                            <div>
+
+                                <p className="font-semibold text-red-900">
+                                    Analysis Failed
+                                </p>
+
+                                <p className="mt-1 text-sm leading-6 text-red-700">
+                                    {error}
+                                </p>
+
+                            </div>
+
+                        </div>
 
                     </div>
 
@@ -111,14 +167,16 @@ function App() {
 
                 {loading && (
 
-                    <div className="mb-8 rounded-lg bg-white p-6 text-center shadow">
+                    <div className="mb-8 rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
 
-                        <p className="font-medium">
+                        <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-slate-900" />
+
+                        <p className="mt-5 font-semibold text-slate-900">
                             Analyzing project...
                         </p>
 
                         <p className="mt-1 text-sm text-slate-500">
-                            Please wait while CodeGuardian scans your project.
+                            CodeGuardian is scanning your Python files.
                         </p>
 
                     </div>
@@ -128,13 +186,26 @@ function App() {
 
                 {/* Analysis Results */}
 
-                {data ? (
+                {data && !loading && (
 
                     <>
 
+                        <div className="mb-6">
+
+                            <h2 className="text-xl font-bold text-slate-900">
+                                Analysis Summary
+                            </h2>
+
+                            <p className="mt-1 text-sm text-slate-500">
+                                Overview of the latest project analysis.
+                            </p>
+
+                        </div>
+
+
                         {/* Summary Cards */}
 
-                        <section className="grid gap-6 md:grid-cols-2 lg:grid-cols-5">
+                        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
 
                             <StatCard
                                 title="Files Scanned"
@@ -144,31 +215,34 @@ function App() {
                             />
 
                             <StatCard
-                                title="Issues"
+                                title="Total Issues"
                                 value={
                                     data.summary.total_issues
                                 }
                             />
 
                             <StatCard
-                                title="High"
+                                title="High Severity"
                                 value={
                                     data.summary.severity_counts?.HIGH ?? 0
                                 }
+                                variant="high"
                             />
 
                             <StatCard
-                                title="Medium"
+                                title="Medium Severity"
                                 value={
                                     data.summary.severity_counts?.MEDIUM ?? 0
                                 }
+                                variant="medium"
                             />
 
                             <StatCard
-                                title="Low"
+                                title="Low Severity"
                                 value={
                                     data.summary.severity_counts?.LOW ?? 0
                                 }
+                                variant="low"
                             />
 
                         </section>
@@ -182,33 +256,39 @@ function App() {
 
                     </>
 
-                ) : (
+                )}
 
-                    /* Empty State */
 
+                {/* Empty State */}
+
+                {!data &&
                     !loading &&
                     !error && (
 
-                        <div className="rounded-xl bg-white p-8 text-center shadow">
+                        <div className="rounded-2xl border border-dashed border-slate-300 bg-white/70 px-6 py-16 text-center">
 
-                            <h2 className="text-xl font-semibold">
-                                No analysis results yet
+                            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-900 text-3xl shadow-lg">
+                                🛡️
+                            </div>
+
+                            <h2 className="mt-6 text-xl font-bold text-slate-900">
+                                Ready to scan
                             </h2>
 
-                            <p className="mt-2 text-slate-500">
-                                Enter a project path above
-                                to begin scanning.
+                            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">
+                                Enter the path to a Python project above
+                                and let CodeGuardian analyze it for potential
+                                code quality issues.
                             </p>
 
                         </div>
 
-                    )
-
-                )}
+                    )}
 
             </div>
 
         </main>
+
     );
 }
 
