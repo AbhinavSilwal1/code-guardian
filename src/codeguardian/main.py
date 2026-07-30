@@ -26,13 +26,11 @@ def severity_color(severity):
     )
 
 
-# Callback function
 @app.callback()
 def callback():
     pass
 
 
-# Scan a project directory
 @app.command()
 def scan(
     path: str,
@@ -48,8 +46,13 @@ def scan(
     ),
 ):
     config_data = load_config(config)
-    engine = AnalysisEngine()
+
+    engine = AnalysisEngine(
+        config=config_data
+    )
+
     issues = engine.analyze_repository(Path(path))
+
     python_files = find_python_files(path)
 
     if json_output:
@@ -57,11 +60,14 @@ def scan(
         return
 
     console.print("\n[bold blue]Scanning project...[/bold blue]\n")
+
     if not issues:
         console.print("[green]✓ No issues found.[/green]")
     else:
-        console.print(f"[yellow]Found {len(issues)} issue(s):[/yellow]\n")
-    
+        console.print(
+            f"[yellow]Found {len(issues)} issue(s):[/yellow]\n"
+        )
+
     for issue in issues:
         color = severity_color(issue.severity)
 
@@ -72,7 +78,7 @@ def scan(
                 expand=False
             )
         )
-    
+
     report = SummaryReport(
         len(python_files),
         issues,

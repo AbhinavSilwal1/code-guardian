@@ -1,13 +1,7 @@
 import ast
 from pathlib import Path
-from codeguardian.analyzers import (
-    BaseAnalyzer,
-    MAX_FUNCTION_LENGTH,
-)
-from codeguardian.models import (
-    Issue,
-    Severity,
-)
+from codeguardian.analyzers import BaseAnalyzer
+from codeguardian.models import Issue, Severity
 from codeguardian.visitors import BaseVisitor
 
 
@@ -23,8 +17,12 @@ class LongFunctionVisitor(BaseVisitor):
 
 
 class LongFunctionAnalyzer(BaseAnalyzer):
+    def __init__(self, max_lines: int = 50):
+        self.max_lines = max_lines
+
     def analyze(self, tree: ast.AST, file_path: Path):
         visitor = LongFunctionVisitor()
+
         visitor.visit(tree)
 
         issues = []
@@ -32,7 +30,8 @@ class LongFunctionAnalyzer(BaseAnalyzer):
         for function in visitor.functions:
             length = (function.end_lineno - function.lineno + 1)
 
-            if length > MAX_FUNCTION_LENGTH:
+            if length > self.max_lines:
+
                 issues.append(
                     Issue(
                         category="long_function",

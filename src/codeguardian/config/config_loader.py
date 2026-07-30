@@ -1,4 +1,5 @@
 from pathlib import Path
+import copy
 import yaml
 
 
@@ -25,18 +26,30 @@ DEFAULT_CONFIG = {
 }
 
 
-def load_config(path: Path = Path("codeguardian.yml")):
+def load_config(
+    path: Path = Path("codeguardian.yml")
+):
     if not path.exists():
-        return DEFAULT_CONFIG
+        return copy.deepcopy(DEFAULT_CONFIG)
 
-    with open(path, "r", encoding="utf-8") as file:
+    with open(
+        path,
+        "r",
+        encoding="utf-8"
+    ) as file:
+
         user_config = yaml.safe_load(file) or {}
 
-    config = DEFAULT_CONFIG.copy()
+
+    config = copy.deepcopy(DEFAULT_CONFIG)
+
 
     if "rules" in user_config:
+
         for rule, settings in user_config["rules"].items():
+
             if rule in config["rules"]:
                 config["rules"][rule].update(settings)
+
 
     return config

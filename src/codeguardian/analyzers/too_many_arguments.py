@@ -1,20 +1,13 @@
 import ast
 from pathlib import Path
-from codeguardian.analyzers import (
-    BaseAnalyzer,
-    MAX_FUNCTION_ARGUMENTS,
-)
-from codeguardian.models import (
-    Issue,
-    Severity,
-)
+from codeguardian.analyzers import BaseAnalyzer
+from codeguardian.models import Issue, Severity
 from codeguardian.visitors import BaseVisitor
 
 
 class TooManyArgumentsVisitor(BaseVisitor):
     def __init__(self):
         super().__init__()
-
         self.functions = []
 
 
@@ -24,17 +17,22 @@ class TooManyArgumentsVisitor(BaseVisitor):
 
 
 class TooManyArgumentsAnalyzer(BaseAnalyzer):
+    def __init__(self, max_arguments: int = 5):
+        self.max_arguments = max_arguments
+
+
     def analyze(self, tree: ast.AST, file_path: Path):
         visitor = TooManyArgumentsVisitor()
+
         visitor.visit(tree)
 
         issues = []
 
         for function in visitor.functions:
-
             arguments = len(function.args.args)
 
-            if arguments > MAX_FUNCTION_ARGUMENTS:
+            if arguments > self.max_arguments:
+
                 issues.append(
                     Issue(
                         category="too_many_arguments",
