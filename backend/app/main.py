@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from backend.app.routes.analysis import router
 from fastapi.middleware.cors import CORSMiddleware
+from backend.app.routes.github import router as github_router
 
 
 app = FastAPI(title="CodeGuardian API")
@@ -20,6 +21,12 @@ app.add_middleware(
 
 app.include_router(
     router,
+    prefix="/api",
+)
+
+
+app.include_router(
+    github_router,
     prefix="/api",
 )
 

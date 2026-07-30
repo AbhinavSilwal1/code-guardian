@@ -17,6 +17,14 @@ class SummarySchema(BaseModel):
     category_counts: dict[str, int]
 
 
+class SourceSchema(BaseModel):
+    type: str | None = None
+    owner: str | None = None
+    repository: str | None = None
+    url: str | None = None
+
+
 class AnalysisResponse(BaseModel):
+    source: SourceSchema | None = None
     summary: SummarySchema
     issues: list[IssueSchema]

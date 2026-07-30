@@ -8,7 +8,7 @@ from codeguardian.formatters import issue_to_dict
 BASE_DIR = Path(__file__).resolve().parents[3]
 
 
-def analyze_project(path: str):
+def analyze_project(path: str, source: dict | None = None,):
     project_path = Path(path)
 
     if not project_path.is_absolute():
@@ -31,6 +31,7 @@ def analyze_project(path: str):
     )
 
     return {
+        "source": source,
         "summary": {
             "files_scanned": len(python_files),
             "total_issues": len(issues),
