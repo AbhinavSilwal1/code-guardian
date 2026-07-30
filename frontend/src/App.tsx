@@ -5,13 +5,19 @@ import IssueBreakdown from "./components/IssueBreakdown";
 import IssuesTable from "./components/IssuesTable";
 import StatCard from "./components/StatCard";
 import SeverityBreakdown from "./components/SeverityBreakdown";
-import { analyzeProject, exportAnalysis, } from "./api/guardianApi";
+import { analyzeProject, analyzeGithubRepository, exportAnalysis, } from "./api/guardianApi";
 import type { AnalysisResponse } from "./types/guardian";
 
 
 function App() {
 
     const [path, setPath] = useState("");
+
+    const [githubUrl, setGithubUrl] =
+        useState("");
+
+    const [sourceType, setSourceType] =
+        useState<"local" | "github">("local");
 
     const [data, setData] =
         useState<AnalysisResponse | null>(null);
@@ -31,9 +37,17 @@ function App() {
 
     async function handleAnalyze() {
 
-        if (!path.trim()) {
+        if (
+            sourceType === "github"
+                ? !githubUrl.trim()
+                : !path.trim()
+        ) {
 
-            setError("Please enter a project path before analyzing.");
+            setError(
+                sourceType === "github"
+                    ? "Please enter a GitHub repository URL before analyzing."
+                    : "Please enter a project path before analyzing."
+            );
 
             return;
         }
@@ -45,22 +59,48 @@ function App() {
 
         setData(null);
 
+
         const startTime =
             performance.now();
 
+
         try {
 
-            const result =
-                await analyzeProject(path);
+            let result;
+
+
+            if (sourceType === "github") {
+
+                result =
+                    await analyzeGithubRepository(
+                        githubUrl
+                    );
+
+            } else {
+
+                result =
+                    await analyzeProject(
+                        path
+                    );
+            }
+
 
             const endTime =
                 performance.now();
 
-            setAnalysisDuration((endTime - startTime) / 1000);
 
-            setLastAnalyzed(new Date());
+            setAnalysisDuration(
+                (endTime - startTime) / 1000
+            );
+
+
+            setLastAnalyzed(
+                new Date()
+            );
+
 
             setData(result);
+
 
         } catch (err) {
 
@@ -76,6 +116,12 @@ function App() {
 
         }
     }
+
+
+    const currentInputValue =
+        sourceType === "github"
+            ? githubUrl
+            : path;
 
 
     return (
@@ -98,8 +144,52 @@ function App() {
                         </h2>
 
                         <p className="mt-1 text-sm text-slate-500">
-                            Enter a relative or absolute path to a Python project.
+                            Analyze a local Python project or a GitHub repository.
                         </p>
+
+                    </div>
+
+
+                    {/* Source Selector */}
+
+                    <div className="mb-4 flex gap-6">
+
+                        <label className="flex items-center gap-2 text-sm text-slate-700">
+
+                            <input
+                                type="radio"
+                                checked={
+                                    sourceType === "local"
+                                }
+                                onChange={() =>
+                                    setSourceType(
+                                        "local"
+                                    )
+                                }
+                            />
+
+                            Local Project
+
+                        </label>
+
+
+                        <label className="flex items-center gap-2 text-sm text-slate-700">
+
+                            <input
+                                type="radio"
+                                checked={
+                                    sourceType === "github"
+                                }
+                                onChange={() =>
+                                    setSourceType(
+                                        "github"
+                                    )
+                                }
+                            />
+
+                            GitHub Repository
+
+                        </label>
 
                     </div>
 
@@ -108,11 +198,33 @@ function App() {
 
                         <input
                             className="flex-1 rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-500 focus:bg-white focus:ring-2 focus:ring-slate-200"
-                            placeholder="/Users/.../my-project"
-                            value={path}
+                            placeholder={
+                                sourceType === "github"
+                                    ? "https://github.com/user/project"
+                                    : "/Users/.../my-project"
+                            }
+                            value={
+                                currentInputValue
+                            }
                             onChange={
-                                (event) =>
-                                    setPath(event.target.value)
+                                (event) => {
+
+                                    if (
+                                        sourceType === "github"
+                                    ) {
+
+                                        setGithubUrl(
+                                            event.target.value
+                                        );
+
+                                    } else {
+
+                                        setPath(
+                                            event.target.value
+                                        );
+                                    }
+
+                                }
                             }
                             onKeyDown={
                                 (event) => {
@@ -137,7 +249,9 @@ function App() {
 
                             {loading
                                 ? "Analyzing..."
-                                : "Analyze Project"
+                                : sourceType === "github"
+                                    ? "Analyze Repository"
+                                    : "Analyze Project"
                             }
 
                         </button>
@@ -155,7 +269,7 @@ function App() {
 
                         <div className="flex gap-4">
 
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600">
+                            <div className="flex h-10 w-10 shrink-0 items-center-center justify-center rounded-full bg-red-100 text-red-600">
                                 !
                             </div>
 
@@ -199,8 +313,6 @@ function App() {
                 )}
 
 
-                {/* Analysis Results */}
-
                 {data && !loading && (
 
                     <>
@@ -218,16 +330,14 @@ function App() {
                         </div>
 
 
-                        {/* Analysis Metadata */}
-
                         <AnalysisSummary
-                            path={path}
+                            path={
+                                data.source?.url ?? path
+                            }
                             duration={analysisDuration}
                             lastAnalyzed={lastAnalyzed}
                         />
 
-
-                        {/* Export Controls */}
 
                         <div className="mb-6 flex justify-end">
 
@@ -256,8 +366,6 @@ function App() {
 
                         </div>
 
-
-                        {/* Summary Cards */}
 
                         <section className="mb-8 grid gap-6 md:grid-cols-2 lg:grid-cols-5">
 
@@ -302,8 +410,6 @@ function App() {
                         </section>
 
 
-                        {/* Severity Breakdown */}
-
                         <SeverityBreakdown
                             severityCounts={
                                 data.summary.severity_counts
@@ -311,10 +417,8 @@ function App() {
                         />
 
 
-                        {/* Issue Breakdown */}
-
                         <div className="mt-8">
-                        
+
                             <IssueBreakdown
                                 categoryCounts={
                                     data.summary.category_counts
@@ -324,18 +428,16 @@ function App() {
                         </div>
 
 
-                        {/* Issues Table */}
-
                         <IssuesTable
-                            issues={data.issues}
+                            issues={
+                                data.issues
+                            }
                         />
 
                     </>
 
                 )}
 
-
-                {/* Empty State */}
 
                 {!data &&
                     !loading &&
@@ -352,9 +454,7 @@ function App() {
                             </h2>
 
                             <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">
-                                Enter the path to a Python project above
-                                and let CodeGuardian analyze it for potential
-                                code quality issues.
+                                Enter a project path or GitHub repository URL above and let CodeGuardian analyze it.
                             </p>
 
                         </div>

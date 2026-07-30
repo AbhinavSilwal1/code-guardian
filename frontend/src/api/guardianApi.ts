@@ -54,6 +54,57 @@ export async function analyzeProject(
 }
 
 
+export async function analyzeGithubRepository(
+    url: string
+): Promise<AnalysisResponse> {
+
+    const endpoint =
+        `${API_URL}/api/github/analyze?url=${encodeURIComponent(url)}`;
+
+
+    const response =
+        await fetch(
+            endpoint,
+            {
+                method: "POST",
+            }
+        );
+
+
+    if (!response.ok) {
+
+        let message =
+            "Unable to analyze GitHub repository.";
+
+
+        try {
+
+            const errorData =
+                await response.json();
+
+
+            if (
+                typeof errorData.detail === "string"
+            ) {
+                message =
+                    errorData.detail;
+            }
+
+        } catch {
+
+            message =
+                "GitHub analysis failed.";
+        }
+
+
+        throw new Error(message);
+    }
+
+
+    return response.json();
+}
+
+
 export function exportAnalysis(
     data: AnalysisResponse
 ) {

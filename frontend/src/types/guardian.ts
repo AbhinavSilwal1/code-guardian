@@ -16,7 +16,16 @@ export type Summary = {
 };
 
 
+export type Source = {
+    type: string | null;
+    owner: string | null;
+    repository: string | null;
+    url: string | null;
+};
+
+
 export type AnalysisResponse = {
+    source: Source | null;
     summary: Summary;
     issues: Issue[];
 };
