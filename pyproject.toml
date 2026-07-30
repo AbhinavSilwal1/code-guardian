@@ -12,6 +12,7 @@ dependencies = [
     "typer",
     "rich",
     "pyyaml",
+    "gitpython",
 ]
 
 

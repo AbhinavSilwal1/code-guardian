@@ -3,9 +3,11 @@ annotated-types==0.7.0
 anyio==4.14.2
 certifi==2026.6.17
 click==8.4.2
--e git+https://github.com/AbhinavSilwal1/code-guardian.git@30c63f0af2b9b6bd66f462bacc9c208290f57fef#egg=codeguardian
+-e git+https://github.com/AbhinavSilwal1/code-guardian.git@a3422c148a0a117494be70d4c6fba08b11619899#egg=codeguardian
 colorama==0.4.6
 fastapi==0.139.2
+gitdb==4.0.12
+GitPython==3.1.57
 h11==0.16.0
 httpcore==1.0.9
 httpx==0.28.1
@@ -26,6 +28,7 @@ radon==6.0.1
 rich==15.0.0
 shellingham==1.5.4
 six==1.17.0
+smmap==5.0.3
 starlette==1.3.1
 typer==0.26.8
 typing-inspection==0.4.2
