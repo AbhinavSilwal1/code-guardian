@@ -5,6 +5,7 @@ import IssueBreakdown from "./components/IssueBreakdown";
 import IssuesTable from "./components/IssuesTable";
 import StatCard from "./components/StatCard";
 import SeverityBreakdown from "./components/SeverityBreakdown";
+import RepositoryInfo from "./components/RepositoryInfo";
 import { analyzeProject, analyzeGithubRepository, exportAnalysis, } from "./api/guardianApi";
 import type { AnalysisResponse } from "./types/guardian";
 
@@ -336,6 +337,11 @@ function App() {
                             }
                             duration={analysisDuration}
                             lastAnalyzed={lastAnalyzed}
+                        />
+
+
+                        <RepositoryInfo
+                            source={data.source}
                         />
 
 
