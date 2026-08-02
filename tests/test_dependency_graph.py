@@ -1,6 +1,5 @@
 from codeguardian.graph import DependencyGraph
 from codeguardian.graph import DependencyGraphBuilder
-from codeguardian.scanner import find_python_files
 
 
 def test_add_dependency():
@@ -47,12 +46,3 @@ def test_dependency_graph_builder(tmp_path):
         "utils",
         "database",
     }
-
-
-builder = DependencyGraphBuilder()
-
-graph = builder.build(
-    find_python_files("examples/sample_project")
-)
-
-print(graph.graph)

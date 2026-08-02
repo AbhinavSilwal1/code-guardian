@@ -14,11 +14,24 @@ def test_root_endpoint():
     }
 
 
-def test_analyze_endpoint():
+def test_analyze_endpoint(tmp_path):
+    project = tmp_path / "sample_project"
+
+    project.mkdir()
+
+    (project / "app.py").write_text(
+        """
+import os
+
+def hello():
+    print("Hello World")
+"""
+    )
+
     response = client.post(
         "/api/analyze",
         params={
-            "path": "examples/sample_project"
+            "path": str(project)
         },
     )
 
@@ -30,13 +43,28 @@ def test_analyze_endpoint():
     assert "issues" in data
 
 
-def test_analyze_response_structure():
+def test_analyze_response_structure(tmp_path):
+    project = tmp_path / "sample_project"
+
+    project.mkdir()
+
+    (project / "app.py").write_text(
+        """
+import os
+
+def hello():
+    print("Hello World")
+"""
+    )
+
     response = client.post(
         "/api/analyze",
         params={
-            "path": "examples/sample_project"
+            "path": str(project)
         },
     )
+
+    assert response.status_code == 200
 
     data = response.json()
 
