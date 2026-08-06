@@ -8,6 +8,7 @@ import SeverityBreakdown from "./components/SeverityBreakdown";
 import RepositoryInfo from "./components/RepositoryInfo";
 import { analyzeProject, analyzeGithubRepository, exportAnalysis, } from "./api/guardianApi";
 import type { AnalysisResponse } from "./types/guardian";
+import logo from "./assets/code_guardian_logo.png";
 
 
 function App() {
@@ -451,8 +452,19 @@ function App() {
 
                         <div className="rounded-2xl border border-dashed border-slate-300 bg-white/70 px-6 py-16 text-center">
 
-                            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-900 text-3xl shadow-lg">
-                                🛡️
+                            <div className="mx-auto">
+                                <img
+                                    src={logo}
+                                    alt="CodeGuardian Logo"
+                                    className="
+                                        mx-auto
+                                        h-16
+                                        w-16
+                                        rounded-2xl
+                                        object-cover
+                                        shadow-lg
+                                    "
+                                />
                             </div>
 
                             <h2 className="mt-6 text-xl font-bold text-slate-900">
