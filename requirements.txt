@@ -3,7 +3,6 @@ annotated-types==0.7.0
 anyio==4.14.2
 certifi==2026.6.17
 click==8.4.2
--e git+https://github.com/AbhinavSilwal1/code-guardian.git@a3422c148a0a117494be70d4c6fba08b11619899#egg=codeguardian
 colorama==0.4.6
 fastapi==0.139.2
 gitdb==4.0.12
