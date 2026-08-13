@@ -1,6 +1,6 @@
 # 🛡️ CodeGuardian
 
-AST-powered static analysis platform for Python projects featuring configurable analysis rules, dependency analysis, circular dependency detection, an interactive React + TypeScript dashboard, and JSON reporting.
+AST-powered static analysis platform for Python projects featuring configurable analysis rules, dependency analysis, circular dependency detection, an interactive React + TypeScript dashboard, GitHub repository analysis, Docker deployment, and JSON reporting.
 
 
 ## 🧠 Overview
@@ -10,6 +10,8 @@ CodeGuardian is a static analysis platform that helps developers identify common
 The core analysis engine uses Python's Abstract Syntax Tree (AST) to detect structural issues such as unused imports, dead code, long functions, excessive function arguments, and circular dependencies.
 
 Starting with version 1.1.0, CodeGuardian combines its static analysis engine with an interactive React + TypeScript dashboard powered by a FastAPI backend. Developers can analyze Python projects, review summary statistics, explore issues in detail, filter and sort results, and export complete analysis reports as JSON.
+
+Starting with version 1.2.0, CodeGuardian also supports direct analysis of public GitHub repositories. Users can provide a GitHub repository URL directly through the dashboard, allowing CodeGuardian to clone and analyze the repository without requiring a local copy.
 
 CodeGuardian can analyze any accessible Python project directory, including projects located outside the CodeGuardian repository itself.
 
@@ -31,6 +33,8 @@ The project is designed with a modular architecture that allows additional analy
 
 - Analyze Python projects through a React + TypeScript web interface
 - Analyze projects located outside the CodeGuardian repository
+- Analyze public GitHub repositories directly through the dashboard
+- View project and repository metadata
 - View project summary statistics
 - View total files scanned and total issues detected
 - View issue counts by severity
@@ -47,7 +51,7 @@ The project is designed with a modular architecture that allows additional analy
 - Copy file paths directly from issue results
 - Copy file locations including line numbers
 - Copy complete issue details for easier debugging and sharing
-- Clear error messages for invalid or missing project paths
+- Clear error messages for invalid, missing, or inaccessible projects and repositories
 - Dedicated empty states for projects with no detected issues
 
 ### Reporting
@@ -68,6 +72,7 @@ The project is designed with a modular architecture that allows additional analy
 - Modular architecture
 - FastAPI backend
 - React + TypeScript frontend
+- Dockerized application deployment
 - Comprehensive pytest test suite
 - Command-line interface powered by Typer
 - Interactive dashboard powered by Tailwind CSS
@@ -83,6 +88,7 @@ The project is designed with a modular architecture that allows additional analy
 - Typer
 - Rich
 - PyYAML
+- GitPython
 
 ### Frontend
 
@@ -90,6 +96,10 @@ The project is designed with a modular architecture that allows additional analy
 - TypeScript
 - Vite
 - Tailwind CSS
+
+### Deployment
+
+- Docker
 
 ### Testing
 
@@ -99,58 +109,36 @@ The project is designed with a modular architecture that allows additional analy
 ## 📦 How To Run
 
 ### Clone the Repository
-
 ```bash
 git clone https://github.com/AbhinavSilwal1/code-guardian.git
 cd code-guardian
 ```
 
-### Set up the Backend
+### Run with Docker
 
-Create and activate a virtual environment:
+CodeGuardian can be built and run as a single Docker container containing both the FastAPI backend and the production React frontend.
+
+Make sure Docker Desktop is installed and running, then build the image from the project root:
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
+docker build -t codeguardian .
 ```
 
-Install the project dependencies:
+Start the container:
 ```bash
-pip install -r requirements.txt
+docker run --rm -p 8000:8000 codeguardian
 ```
 
-### Start the Backend
-
-From the CodeGuardian project root directory, start the FastAPI server:
-```bash
-uvicorn backend.app.main:app --reload
-```
-
-The backend API will be available at:
+The CodeGuardian dashboard will be available at:
 ```text
-http://127.0.0.1:8000
+http://localhost:8000
 ```
 
-### Set up the Frontend
-
-Open a second terminal and navigate to the frontend directory:
-```bash
-cd frontend
-```
-
-Install the frontend dependencies:
-```bash
-npm install
-```
-
-Start the React development server:
-```bash
-npm run dev
-```
-
-The frontend will be available at:
+The FastAPI API documentation will be available at:
 ```text
-http://localhost:5173
+http://localhost:8000/docs
 ```
+
+To stop the application, press `Ctrl+C` in the terminal running the container.
 
 ### Analyze a Project
 
@@ -163,6 +151,17 @@ For example:
 
 CodeGuardian can analyze projects located inside or outside the CodeGuardian repository.
 
+### Analyze a GitHub Repository
+
+Select **GitHub Repository** in the dashboard and enter the URL of a publicly accessible GitHub repository.
+
+For example:
+```text
+https://github.com/user/project
+```
+
+CodeGuardian will clone the repository, analyze its Python files, and display the results directly in the dashboard.
+
 The dashboard will display:
 
 - Files scanned
@@ -170,6 +169,7 @@ The dashboard will display:
 - Issues by severity
 - Severity breakdown
 - Detailed issue results
+- Repository metadata for GitHub analyses
 
 You can then filter, sort, search, and inspect individual issues directly from the dashboard.
 
@@ -198,11 +198,11 @@ python -m codeguardian.main scan path/to/project --config custom.yml
 
 ### Analysis Dashboard
 
-![CodeGuardian Dashboard](assets/dashboard.png)
+![CodeGuardian Dashboard](assets/frontend-dashboard.png)
 
 ### Issue Details
 
-![CodeGuardian Issue Details](assets/issue-details.png)
+![CodeGuardian Issue Details](assets/issues-details.png)
 
 
 ## ⚙️ Configuration
@@ -240,12 +240,18 @@ Run the complete test suite:
 pytest
 ```
 
-The v1.1.0 release includes a comprehensive automated test suite covering the CodeGuardian analysis engine and backend functionality.
+The v1.2.0 release includes a comprehensive automated test suite covering the CodeGuardian analysis engine, GitHub integration, and backend functionality.
 
 The frontend production build can be verified with:
 ```bash
 cd frontend
 npm run build
+```
+
+The complete application can also be verified by building and running the Docker image:
+```bash
+docker build -t codeguardian .
+docker run --rm -p 8000:8000 codeguardian
 ```
 
 
