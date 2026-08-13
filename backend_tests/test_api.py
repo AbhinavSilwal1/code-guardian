@@ -9,9 +9,7 @@ def test_root_endpoint():
     response = client.get("/")
 
     assert response.status_code == 200
-    assert response.json() == {
-        "message": "CodeGuardian API running"
-    }
+    assert "CodeGuardian" in response.text
 
 
 def test_analyze_endpoint(tmp_path):

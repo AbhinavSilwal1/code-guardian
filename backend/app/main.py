@@ -1,6 +1,8 @@
+from pathlib import Path
 from fastapi import FastAPI
-from backend.app.routes.analysis import router
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from backend.app.routes.analysis import router
 from backend.app.routes.github import router as github_router
 
 
@@ -31,8 +33,20 @@ app.include_router(
 )
 
 
-@app.get("/")
-def root():
-    return {
-        "message": "CodeGuardian API running"
-    }
+frontend_dist = Path("frontend/dist")
+
+
+if frontend_dist.exists():
+    app.mount(
+        "/",
+        StaticFiles(
+            directory=frontend_dist,
+            html=True,
+        ),
+        name="frontend",
+    )
+
+else:
+    @app.get("/")
+    def root():
+        return {"message": "CodeGuardian API running"}
